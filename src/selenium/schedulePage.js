@@ -1,6 +1,9 @@
 var BasePage = require('./basePage.js');
 var By = require('selenium-webdriver').By;
 var until = require('selenium-webdriver').until;
+var fs = require('fs'),
+    path = require('path'),
+    _ = require('underscore');
 
 var SchedulePage = Object.create(BasePage);
 var datesId = ['2017-03-17', '2017-03-18', '2017-03-19'];
@@ -18,6 +21,7 @@ SchedulePage.toggleSessionElem = function() {
 
   // Checking the toggle behaviour of session having id 3014
   var promise = new Promise(function(resolve) {
+
     self.find(By.id('title-3014')).then(self.click).then(self.driver.sleep(1000)).then(function() {
       resolve(self.find(By.id('desc-3014')).isDisplayed());
     });
@@ -56,6 +60,71 @@ SchedulePage.toggleMode = function() {
   var toggleButtonId = 'page-mode';
 
   return self.find(By.id(toggleButtonId)).then(self.click).then(self.getCurrentView.bind(self));
+};
+
+SchedulePage.getDownloadDropdown = function() {
+  var self = this;
+  var downloadButtonId = 'dropdown-toggle';
+  var promiseArr = [];
+
+  var promise = new Promise(function (resolve) {
+      self.find(By.className(downloadButtonId)).then(self.click).then(self.driver.sleep(1000)).then(function () {
+         self.find(By.className('export-png')).then(self.click).then(self.driver.sleep(10000)).then(function(){
+          // Return only base file name without dir
+
+          function getMostRecentFileName(dir) {
+              var files = fs.readdirSync(dir);
+
+              // use underscore for max()
+              return _.max(files, function (f) {
+                  var fullpath = path.join(dir, f);
+
+                  // ctime = creation time is used
+                  // replace with mtime for modification time
+                  return fs.statSync(fullpath).ctime;
+              });
+          }
+
+          var DownloadedFile = getMostRecentFileName(path.join('C:','Users','Administrator','Downloads'));
+          if(DownloadedFile === '2017-03-19 day-filter.png')
+          {
+              promiseArr.push(true);
+          }
+          else{
+              promiseArr.push(false);
+          }
+         }).then(function() {
+             self.find(By.className(downloadButtonId)).then(self.click).then(self.driver.sleep(1000)).then(function () {
+                 self.find(By.className('export-schedule')).then(self.click).then(self.driver.sleep(10000)).then(function () {
+                     // Return only base file name without dir
+                     function getMostRecentFileName(dir) {
+                         var files = fs.readdirSync(dir);
+
+                         // use underscore for max()
+                         return _.max(files, function (f) {
+                             var fullpath = path.join(dir, f);
+
+                             // ctime = creation time is used
+                             // replace with mtime for modification time
+                             return fs.statSync(fullpath).ctime;
+                         });
+                     }
+
+                     var DownloadedFile = getMostRecentFileName(path.join('C:','Users','Administrator','Downloads'));
+
+                     if (DownloadedFile === 'FOSSASIA Summit.ics') {
+                         promiseArr.push(true);
+                     }
+                     else {
+                         promiseArr.push(false);
+                     }
+                     resolve(Promise.all(promiseArr));
+                 });
+             });
+         });
+      });
+    });
+  return promise;
 };
 
 module.exports = SchedulePage;
