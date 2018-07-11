@@ -12,7 +12,7 @@ $(document).ready(function() {
     } else if (source === 'go') {
       window.open('https://plus.google.com/share?url=' + encodeURIComponent(link), 'google', 'height=360, width=580');
     } else if (source === 'li') {
-      window.open('http://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(link), 'linkedin', 'height=360, width=580');
+      window.open('http://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(link) + '?latest' + encodeURIComponent(link), 'linkedin', 'height=360, width=580');
     }
   });
 });
