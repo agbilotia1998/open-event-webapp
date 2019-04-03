@@ -610,7 +610,7 @@ exports.createDistDir = function(req, socket, callback) {
         }, 30000);
       }
 
-      mailer.uploadAndsendMail(req.body.email, eventName, socket, (obj) => {
+      /*mailer.uploadAndsendMail(req.body.email, eventName, socket, (obj) => {
         if (obj.mail) {
           logger.addLog('Success', 'Mail sent succesfully', socket);
         } else {
@@ -618,8 +618,9 @@ exports.createDistDir = function(req, socket, callback) {
         }
         callback(appFolder, obj.url);
         done(null, 'write');
-      });
-
+      });*/
+	callback(appFolder, 'abc');
+        done(null, 'write');
       process.on('uncaughtException', function(err) {
         if (err.code === 'ETIMEDOUT') {
           console.log('Failed to connect to address ' + err.address);
